@@ -21,11 +21,14 @@ def remove_stopwords(raw_data):
 
     clean_data = {}
     stop_words = set(stopwords.words('portuguese'))
-    stops = ["á", "à", "dizer", "ainda", "é", "grande", "êle", "êla", "mesma", "parte", "quer", "sobre", "quase", "nesta", "todo", "todos", "assim", "vai", "tão"] 
-    for i in stops:
-        stop_words.add(i)
-
     
+    stop_domain = []
+    with open('stop.txt') as file:
+        stop_domain = file.readlines()
+        stop_domain = [line.rstrip() for line in stop_domain]
+
+    for i in stop_domain:
+        stop_words.add(i)
 
     for k,v in raw_data.items():
         filtered_text = [w for w in v.split() if not w.lower() in stop_words]
