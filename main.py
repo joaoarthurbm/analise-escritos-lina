@@ -5,6 +5,13 @@ from gensim import corpora, models
 import re
 
 
+import unicodedata
+
+def remover_combinantes(string):
+
+    string = unicodedata.normalize('NFD', string)
+    return u''.join(ch for ch in string if unicodedata.category(ch) != 'Mn')
+
 def read_map():
     with open('dados.csv') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -13,7 +20,8 @@ def read_map():
 
         for line in reader:
             k, v =  line['id'], line['conteudo']
-            raw_data[k] = re.sub(r'[^\w\s]','',v.lower())
+            v = 'baiano' if v.lower() == "bahiano" else v.lower()
+            raw_data[k] = remover_combinantes(re.sub(r'[^\w\s]','',v))
     
     return raw_data
 
