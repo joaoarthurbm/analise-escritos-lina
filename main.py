@@ -1,8 +1,10 @@
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 import nltk
 import csv
 from nltk.corpus import stopwords
 from gensim import corpora, models
 import re
+import pandas as pd
 
 
 import unicodedata
@@ -62,7 +64,6 @@ def extract_topics(data_map):
 
     for i in range(len(corpus)):
         
-        
         s_out = ""
         list_topics = lda_model[corpus[i]]
         for topic in list_topics:
@@ -74,7 +75,51 @@ def extract_topics(data_map):
         ids = list(data_map.keys())
         print('{}-{}-{}'.format(ids[i], list_topics, s_out[:-1]  ))
 
+    # print topics
+    for topic in topics:
+        print(topic)
 
+def analyze_n_grams(id_text, tokens, from_n, to_n, top):
+    data = [' '.join(tokens)]
+    
+    # Getting trigrams
+    vectorizer = CountVectorizer(ngram_range = (from_n,to_n))
+    vectorizer.fit_transform(data)
+    features = (vectorizer.get_feature_names_out())
+
+    # Applying TFIDF
+    vectorizer = TfidfVectorizer(ngram_range = (from_n,to_n))
+    X2 = vectorizer.fit_transform(data)
+
+    # Getting top ranking features
+    sums = X2.sum(axis = 0)
+    term_rank = []
+    for col, term in enumerate(features):
+        term_rank.append( (id_text, term, sums[0,col] ))
+    ranking = pd.DataFrame(term_rank, columns = ['id_texto', 'term','rank'])
+    words = (ranking.sort_values('rank', ascending = False))
+    print (words.head(20))
+
+# preprocessing
 raw_data = read_map()
 clean_data_map = remove_stopwords(raw_data)
-extract_topics(clean_data_map)
+
+#extract_topics(clean_data_map)
+
+
+
+### ngrams analysis - one by one
+# just the 20 most important and 1, 2 e 3grams
+#for k, v in clean_data_map.items():
+#    analyze_n_grams(k, v, 1, 1, 20)
+#    print()
+
+### ngrams analysis - the entire corpus
+#text_blob = []
+#texts = list(clean_data_map.values())
+#for i in range(len(texts)):
+#    for token in texts[i]:
+#        text_blob.append(token)
+
+#for i in [1, 2, 3]:
+#    analyze_n_grams(text_blob, i, i, 20)
