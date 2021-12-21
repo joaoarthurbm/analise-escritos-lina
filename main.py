@@ -46,21 +46,21 @@ def remove_stopwords(raw_data):
 
     return clean_data
 
-def extract_topics(data_map):
+def extract_topics(data_map, n_topics = 15, n_words = 10):
     texts = list(data_map.values())
+    
     dictionary_LDA = corpora.Dictionary(texts)
     
     dictionary_LDA.filter_extremes(no_below=3)
     corpus = [dictionary_LDA.doc2bow(list_of_tokens) for list_of_tokens in texts]
 
-    num_topics = 15
-    lda_model = models.LdaModel(corpus, num_topics=num_topics,
+    lda_model = models.LdaModel(corpus, num_topics=n_topics,
                                   id2word=dictionary_LDA,
-                                  passes=4, alpha=[0.01]*num_topics,
+                                  passes=4, alpha=[0.01]*n_topics,
                                   eta=[0.01]*len(dictionary_LDA.keys()))
 
     
-    topics = lda_model.print_topics(num_topics=15, num_words=10)
+    topics = lda_model.print_topics(num_topics=n_topics, num_words=n_words)
 
     for i in range(len(corpus)):
         
@@ -100,13 +100,34 @@ def analyze_n_grams(id_text, tokens, from_n, to_n, top):
     words = (ranking.sort_values('rank', ascending = False))
     print (words.head(20))
 
+# returns an unified list of tokens
+def merge_texts_to_blob(text_ids, clean_data_map):
+    blob = []
+    for k in text_ids:
+        tokens = clean_data_map[k]
+        blob.extend(tokens)
+
+    return blob
+
 # preprocessing
 raw_data = read_map()
+
+# map<string,[tokens]>
 clean_data_map = remove_stopwords(raw_data)
 
-#extract_topics(clean_data_map)
+cronicas = ["tp_dn1_cultura_e_nao_cultura",
+        "tp_dn2_arquitetura_ou_arquitetura", "tp_dn3_inatualidade_da_cultura",
+        "tp_dn4_a_escola_e_a_vida",
+        "tp_dn5_casas_ou_museus",
+        "tp_dn6_a_invasao",
+        "tp_dn7_a_lua",
+        "tp_dn8_arte_industrial"]
 
-
+tokens_cronicas = []
+for k in cronicas:
+    if k in clean_data_map:
+        tokens_cronicas.extend(clean_data_map[k])
+extract_topics({'cronicas': tokens_cronicas}, 5, 10)
 
 ### ngrams analysis - one by one
 # just the 20 most important and 1, 2 e 3grams
@@ -123,3 +144,7 @@ clean_data_map = remove_stopwords(raw_data)
 
 #for i in [1, 2, 3]:
 #    analyze_n_grams(text_blob, i, i, 20)
+
+
+
+#analyze_n_grams("ob", merge_texts_to_blob([c for c in clean_data_map.keys() if c.startswith("ob")], clean_data_map), 1, 1, 20)
