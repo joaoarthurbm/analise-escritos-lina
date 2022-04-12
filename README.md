@@ -1,4 +1,4 @@
-# analise-escritos-lina
+# Análise de Tópicos nos artigos de Lina Bo Bardi
 
 Repositório da análise de tópicos efetuada em textos de autoria da arquitetra Lina Bo Bardi. O modelo utulizado foi o LDA.
 
