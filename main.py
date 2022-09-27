@@ -115,19 +115,20 @@ raw_data = read_map()
 # map<string,[tokens]>
 clean_data_map = remove_stopwords(raw_data)
 
-cronicas = ["tp_dn1_cultura_e_nao_cultura",
-        "tp_dn2_arquitetura_ou_arquitetura", "tp_dn3_inatualidade_da_cultura",
-        "tp_dn4_a_escola_e_a_vida",
-        "tp_dn5_casas_ou_museus",
-        "tp_dn6_a_invasao",
-        "tp_dn7_a_lua",
-        "tp_dn8_arte_industrial"]
+#cronicas = ["tp_dn1_cultura_e_nao_cultura",
+#        "tp_dn2_arquitetura_ou_arquitetura", "tp_dn3_inatualidade_da_cultura",
+#        "tp_dn4_a_escola_e_a_vida",
+#        "tp_dn5_casas_ou_museus",
+#        "tp_dn6_a_invasao",
+#        "tp_dn7_a_lua",
+#        "tp_dn8_arte_industrial"]
 
-tokens_cronicas = []
-for k in cronicas:
-    if k in clean_data_map:
-        tokens_cronicas.extend(clean_data_map[k])
-extract_topics({'cronicas': tokens_cronicas}, 5, 10)
+#tokens_cronicas = []
+#for k in cronicas:
+#    if k in clean_data_map:
+#        tokens_cronicas.extend(clean_data_map[k])
+#        print(tokens_cronicas)
+#extract_topics({'cronicas': tokens_cronicas}, 5, 10)
 
 ### ngrams analysis - one by one
 # just the 20 most important and 1, 2 e 3grams
@@ -136,14 +137,17 @@ extract_topics({'cronicas': tokens_cronicas}, 5, 10)
 #    print()
 
 ### ngrams analysis - the entire corpus
-#text_blob = []
-#texts = list(clean_data_map.values())
-#for i in range(len(texts)):
-#    for token in texts[i]:
-#        text_blob.append(token)
+text_blob = []
+texts = list(clean_data_map.values())
+for i in range(len(texts)):
+    for token in texts[i]:
+        text_blob.append(token)
 
-#for i in [1, 2, 3]:
-#    analyze_n_grams(text_blob, i, i, 20)
+stemmer = nltk.stem.RSLPStemmer()
+text_blob = [stemmer.stem(palavra) for palavra in text_blob]
+
+for i in [1]:
+    analyze_n_grams("blob", text_blob, i, i, 20)
 
 
 
